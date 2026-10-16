@@ -19,10 +19,23 @@ const errorHandler = require('./middleware/error');
 
 const app = express();
 
-const corsOrigin = process.env.CORS_ORIGIN || '*';
+const corsOrigin = process.env.CORS_ORIGIN;
 app.use(
   cors({
-    origin: corsOrigin === '*' ? true : corsOrigin,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (
+        !corsOrigin ||
+        corsOrigin === '*' ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1') ||
+        origin === corsOrigin ||
+        origin === corsOrigin.replace(/\/+$/, '')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );
